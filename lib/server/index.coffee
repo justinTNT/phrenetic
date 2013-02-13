@@ -49,7 +49,8 @@ module.exports = (middlewares) ->
 			next()
 		
 		# Hook for project-specific middleware.
-		app.use middleware for middleware in middlewares
+		if middlewares
+			app.use middleware for middleware in middlewares
 
 		app.use app.router
 		app.use assets.pipeline.middleware()
