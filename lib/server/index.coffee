@@ -14,7 +14,7 @@ module.exports = (middlewares, setup) ->
 		port: url.port
 		pass: url.auth.split(':')[1]
 
-	setup? appprojectRoot
+	setup? app
 
 
 	app.configure ->
