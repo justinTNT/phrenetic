@@ -26,8 +26,7 @@ module.exports = (setup) ->
 	socket.on 'reloadApp', ->
 		window.location.reload()
 	socket.on 'reloadStyles', ->
-		stylesheet = $('link[href="/app.css"]')
-		stylesheet.attr 'href', 'app.css?timestamp=' + Date.now()
+		$('#styles').attr 'href', '/app.css?timestamp=' + Date.now()
 
 	require('./store') DS, App, socket
 	require('./ember') Ember, App
