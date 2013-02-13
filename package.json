@@ -1,0 +1,23 @@
+{
+	"name": "phrenetic",
+	"version": "0.1.0",
+	"dependencies": {
+		"coffee-script": "1.4.0",
+		"longjohn": "0.0.4",
+		"underscore": "1.4.3",
+		"underscore.string": "2.3.1",
+		"express.io": "git://github.com/pharcosyle/express.io.git#socket-semantics-fix",
+		"connect-redis": "1.4.5",
+		"jade": "0.28.1",
+		"nib": "0.9.1",
+		"mongoose": "3.5.4",
+		"nodemailer": "0.3.37",
+		"browserify": "1.17.2",
+		"convoy": "0.4.1",
+		"convoy-stylus": "0.1.4",
+		"less": "1.3.3",
+		"uglify-js": "2.2.3",
+		"socket.io-client": "0.9.11",
+		"mongodb_s3_backup": "0.0.4"
+	}
+}

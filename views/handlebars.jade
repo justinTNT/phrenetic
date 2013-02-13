@@ -1,0 +1,33 @@
+mixin if(args)
+	| {{#if !{args}}}
+	block
+	| {{/if}}
+
+mixin unless(args)
+	| {{#unless !{args}}}
+	block
+	| {{/unless}}
+
+mixin each(args)
+	| {{#each !{args}}}
+	block
+	| {{/each}}
+
+mixin view(args)
+	if block
+		| {{#view !{args}}}
+		block
+		| {{/view}}
+	else
+		| {{view !{args}}}
+
+
+mixin else
+	| {{else}}
+
+
+//- TO-DO Remove this once ember is upgraded and uses of the #collection helper removed.
+mixin collection(args)
+	| {{#collection !{args}}}
+	block
+	| {{/collection}}
