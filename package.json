@@ -19,5 +19,8 @@
 		"uglify-js": "2.2.3",
 		"socket.io-client": "0.9.11",
 		"mongodb_s3_backup": "0.0.4"
+	},
+	"bin" : {
+		"mongodump" : "./bin/mongodump"
 	}
 }
