@@ -33,3 +33,10 @@ module.exports = (setup) ->
 	require('./ember') Ember, App
 
 	setup? Ember, DS, App, socket
+
+	socket.emit 'session', (session) ->
+		if id = session.user
+			App.auth.login id
+		else
+			App.auth.logout()
+		App.initialize()
