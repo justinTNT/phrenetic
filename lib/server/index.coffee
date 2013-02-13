@@ -48,10 +48,7 @@ module.exports = (middlewares, setup) ->
 				req.session.user = user
 			next()
 		
-		# Hook for app-specific middleware.
-		_ = require 'underscore'
-		if not _.isArray middlewares
-			middlewares = [middlewares]
+		# Hook for project-specific middleware.
 		app.use middleware for middleware in middlewares
 
 		app.use app.router
