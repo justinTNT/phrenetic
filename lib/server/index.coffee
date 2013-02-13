@@ -14,13 +14,13 @@ module.exports = (middlewares, setup) ->
 		port: url.port
 		pass: url.auth.split(':')[1]
 
-	setup? app
+	setup? appprojectRoot
 
 
 	app.configure ->
 		app.set 'port', process.env.PORT or 5000
 
-		app.set 'views', path.join(root, 'views')
+		app.set 'views', path.join(projectRoot, 'views')
 		app.set 'view engine', 'jade'
 		app.locals.pretty = true
 
