@@ -4,10 +4,12 @@ module.exports = (root, projectRoot, app, variables) ->
 
 	bundle = require('browserify')
 		exports: 'process'
-		filter: (c) ->
-			require('uglify-js').minify(c, {fromString:true}).code
 		watch: process.env.NODE_ENV is 'development'
 		# debug: true
+	bundle.register 'post', (body) ->
+		if process.env.NODE_ENV is 'development'
+			return body
+		require('uglify-js').minify(body, fromString: true).code
 	bundle.register '.jade', (body, filename) ->
 		include = 'include ' + path.relative(path.dirname(filename), path.join(root, 'views/handlebars')) + '\n'
 		data = require('jade').compile(include + body, filename: filename)()
