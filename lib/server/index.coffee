@@ -14,6 +14,8 @@ module.exports = (middlewares, setup) ->
 		port: url.port
 		pass: url.auth.split(':')[1]
 
+	setup? app
+
 
 	app.configure ->
 		app.set 'port', process.env.PORT or 5000
@@ -89,7 +91,6 @@ module.exports = (middlewares, setup) ->
 	assets.pipeline.on 'invalidate', ->
 		app.io.broadcast 'reloadStyles'
 
-	setup? app
 
 	app.listen app.get('port'), ->
 		console.info 'App started in ' + process.env.APP_ENV + ' environment, listening on port ' + app.get('port')
