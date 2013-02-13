@@ -1,4 +1,4 @@
-module.exports = (middlewares, setup) ->
+module.exports = (middlewares) ->
 	path = require 'path'
 
 
@@ -13,8 +13,6 @@ module.exports = (middlewares, setup) ->
 		host: url.hostname
 		port: url.port
 		pass: url.auth.split(':')[1]
-
-	setup? app
 
 
 	app.configure ->
