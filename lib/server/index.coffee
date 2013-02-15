@@ -1,10 +1,8 @@
-module.exports = (middlewares) ->
+module.exports = (projectRoot) ->
 	path = require 'path'
 
 
 	root = path.dirname path.dirname __dirname
-	projectRoot = path.dirname path.dirname path.dirname module.parent.filename
-
 	express = require 'express.io'
 	app = express().http().io()
 	assets = require('./assets') root, projectRoot, app, ['NODE_ENV', 'HOST']
@@ -49,8 +47,9 @@ module.exports = (middlewares) ->
 			next()
 		
 		# Hook for project-specific middleware.
-		if middlewares
-			app.use middleware for middleware in middlewares
+		try
+			require(projectRoot + '/lib/server/middleware') app
+		catch e
 
 		app.use app.router
 		app.use assets.pipeline.middleware()
