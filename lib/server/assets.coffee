@@ -41,6 +41,7 @@ module.exports = (root, projectRoot, app, variables) ->
 			packager: require 'convoy-stylus'
 			postprocessors: [ (asset, context, done) ->
 				basePath = projectRoot + '/styles/base.less'
+				context.watchPath basePath
 				fs = require 'fs'
 				fs.readFile basePath, 'utf8', (err, body) ->
 					return done err if err
