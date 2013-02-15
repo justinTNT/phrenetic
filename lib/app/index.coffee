@@ -17,7 +17,7 @@ module.exports = (setup) ->
 	App.ready = ->
 		$('#initializing').remove()
 
-	io = require 'socket.io-client'
+	io = require 'express.io/node_modules/socket.io/node_modules/socket.io-client'
 	socket = io.connect require('./util').baseUrl
 	socket.on 'error', ->
 		# TODO remove once I'm convinced this never happens

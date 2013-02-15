@@ -69,6 +69,7 @@ module.exports = (projectRoot) ->
 	# Heroku doesn't support websockets, force long polling.
 	app.io.set 'transports', ['xhr-polling']
 	app.io.set 'polling duration', 10
+	app.io.set 'log', true   # Express.io defaults this to false.
 	app.io.set 'log level', if process.env.NODE_ENV is 'development' then 2 else 1
 	app.io.set 'store', do ->
 		redis = require 'connect-redis/node_modules/redis'
