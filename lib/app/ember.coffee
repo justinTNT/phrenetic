@@ -7,10 +7,9 @@ module.exports = (Ember, App) ->
 		rangeStart: 0
 		totalBinding: 'content.length'
 		itemsPerPage: 10
-		pageChanged: (->
-				items = @get('content').slice @get('rangeStart'), @get('rangeStop')
-				@set 'paginatedItems', items
-			).observes 'content.@each', 'rangeStart', 'rangeStop'
+		paginatedItems: (->
+				@get('content').slice @get('rangeStart'), @get('rangeStop')
+			).property 'content.@each', 'rangeStart', 'rangeStop'
 
 		rangeStop: (->
 				Math.min @get('rangeStart') + @get('itemsPerPage'), @get('total')
