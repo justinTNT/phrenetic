@@ -1,86 +1,80 @@
-module.exports = (DS, App, socket) ->
-	
-	App.adapter = DS.Adapter.create do ->
+module.exports = (Ember, DS, App, socket) ->
+	_ = require 'underscore'
+
+
+	# Override this private helper to ensure that ember-data doesn't try to automatically pair up any inverses.
+	DS._inverseRelationshipFor = ->
+
+	adapter = DS.Adapter.create do ->
 		getTypeName = (type) ->
-			_ = require 'underscore'
 			_.last type.toString().split('.')
 
 		find: (store, type, id) ->
-			socket.emit 'db', op: 'find', type: getTypeName(type), id: id, (data) ->
-				store.load type, id, data
-
-		findMany: (store, type, ids) ->
-			socket.emit 'db', op: 'find', type: getTypeName(type), ids: ids, (data) ->
-				data.sort (a, b) ->
-					aIndex = ids.indexOf a.id
-					bIndex = ids.indexOf b.id
-					return -1 if aIndex < bIndex
-					return 1 if aIndex > bIndex
-					return 0
-				store.loadMany type, data
-
-		findQuery: (store, type, query, array) ->
-			if not query.conditions and not query.options
-				query = conditions: query
-			socket.emit 'db', op: 'find', type: getTypeName(type), query: query, (data) ->
-				array.load data
-
-		findAll: (store, type) ->
-			socket.emit 'db', op: 'find', type: getTypeName(type), (data) ->
-				store.loadMany type, data
+			socket.emit 'db', op: 'find', type: getTypeName(type), id: id, (json) =>
+				Ember.run this, ->
+					@didFindRecord store, type, json, id
+		findMany: (store, type, ids, owner) ->
+			socket.emit 'db', op: 'find', type: getTypeName(type), ids: ids, (json) =>
+				Ember.run this, ->
+					@didFindMany store, type, json
+		findQuery: (store, type, query, recordArray) ->
+			socket.emit 'db', op: 'find', type: getTypeName(type), query: query, (json) =>
+				Ember.run this, ->
+					@didFindQuery store, type, json, recordArray
+		findAll: (store, type, since) ->
+			socket.emit 'db', op: 'find', type: getTypeName(type), (json) =>
+				Ember.run this, ->
+					@didFindAll store, type, json
 
 		createRecord: (store, type, record) ->
-			socket.emit 'db', op: 'create', type: getTypeName(type), record: record.toJSON(), (data) ->
-				store.didSaveRecord record, data
-
-		# createRecords: (store, type, array) ->
-		# 	socket.emit 'db', op: 'create', type: getTypeName(type), record: array.mapProperty('data'), (data) ->
-		# 		store.didCreateRecords type, array, data
-
+			socket.emit 'db', op: 'create', type: getTypeName(type), record: record.serialize(), (json) =>
+				Ember.run this, ->
+					@didCreateRecord store, type, record, json
 		updateRecord: (store, type, record) ->
-			socket.emit 'db', op: 'save', type: getTypeName(type), record: record.toJSON(includeId: true), (data) ->
-				store.didSaveRecord record, data
-
-		# udpateRecords: (store, type, array) ->
-		# 	socket.emit 'db', op: 'save', type: getTypeName(type), record: array.mapProperty('data'), (data) ->
-		# 		store.didUpdateRecords type, array, data
-
+			socket.emit 'db', op: 'save', type: getTypeName(type), record: record.serialize(includeId: true), (json) =>
+				Ember.run this, ->
+					@didSaveRecord store, type, record, json
 		deleteRecord: (store, type, record) ->
-			socket.emit 'db', op: 'remove', type: getTypeName(type), id: record.get('id'), ->
-				store.didSaveRecord record
+			socket.emit 'db', op: 'remove', type: getTypeName(type), id: record.get('id'), =>
+				Ember.run this, ->
+					@didSaveRecord store, type, record
 
-		# deleteRecords: (store, type, array) ->
-		# 	socket.emit 'db', op: 'remove', type: getTypeName(type), ids: model.get('id'), ->
-		# 		store.didDeleteRecords array
-
-
-		serializer: DS.Serializer.create
-			addBelongsTo: (hash, record, key, relationship) ->
-				hashKey = @._keyForBelongsTo record.constructor, key
-				id = record.get key + '.id'
-				hash[hashKey] = id
-
+		serializer: DS.JSONSerializer.extend
 			addHasMany: (hash, record, key, relationship) ->
-				hashKey = @._keyForHasMany record.constructor, key
-				ids = record.get(key).getEach('id')
-				hash[hashKey] = ids
+				@_super hash, record, key, relationship
+				type = record.constructor
+				name = relationship.key
+				if not @embeddedType type, name
+					ids = record.get(name).getEach('id')
+					hash[key] = ids
 
 
-	App.adapter.registerTransform 'date',
-		fromJSON: (value) ->
-			if value
-				date = new Date value
+	# Technically this probably shouldn't be on the adapter.
+	adapter.registerTransform 'array',
+		serialize: (deserialized) ->
+			deserialized
+		deserialize: (serialized) ->
+			serialized
+	# TO-DO workarounds for JSONSerializer turning undefined into null
+	adapter.registerTransform 'date',
+		serialize: (deserialized) ->
+			deserialized
+		deserialize: (serialized) ->
+			if serialized
+				date = new Date serialized
 				throw new Error 'Invalid date.' if isNaN date
 				return date
-		toJSON: (value) ->
-			value
-	App.adapter.registerTransform 'array',
-		fromJSON: (value) ->
-			value
-		toJSON: (value) ->
-			value
+	adapter.registerTransform 'string',
+		serialize: (value) -> value
+		deserialize: (value) -> value
+	adapter.registerTransform 'number',
+		serialize: (value) -> value
+		deserialize: (value) -> value
+	adapter.registerTransform 'boolean',
+		serialize: (value) -> value
+		deserialize: (value) -> value
 
 
 	App.store = DS.Store.create
-		revision: 6
-		adapter: App.adapter
+		revision: 11
+		adapter: adapter

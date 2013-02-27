@@ -1,5 +1,5 @@
 module.exports = (setup) ->
-	
+
 	require '../vendor'
 
 	CONFIG_VARIABLES
@@ -12,8 +12,9 @@ module.exports = (setup) ->
 	# 	alert 'asdf'
 	# 	console.log err
 
-	window.App = Ember.Application.create autoinit: false
-	
+	window.App = Ember.Application.create
+		LOG_TRANSITIONS: process.env.NODE_ENV is 'development'
+	App.deferReadiness()
 	App.ready = ->
 		$('#initializing').remove()
 
@@ -28,14 +29,7 @@ module.exports = (setup) ->
 	socket.on 'reloadStyles', ->
 		$('#styles').attr 'href', '/app.css?timestamp=' + Date.now()
 
-	require('./store') DS, App, socket
+	require('./store') Ember, DS, App, socket
 	require('./ember') Ember, App
 
 	setup? Ember, DS, App, socket
-
-	socket.emit 'session', (session) ->
-		if id = session.user
-			App.auth.login id
-		else
-			App.auth.logout()
-		App.initialize()

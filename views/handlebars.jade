@@ -21,6 +21,14 @@ mixin view(args)
 	else
 		| {{view !{args}}}
 
+mixin linkTo(args, text)
+	| {{#linkTo !{args}}}
+	if block
+		block
+	else
+		!= text
+	| {{/linkTo}}
+
 
 mixin else
 	| {{else}}
