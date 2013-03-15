@@ -16,3 +16,5 @@ else try {
 		throw err;
 	require('./lib/' + module);
 }
+
+// TESTING!
