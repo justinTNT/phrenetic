@@ -76,5 +76,5 @@ module.exports = (Ember, DS, App, socket) ->
 
 
 	App.store = DS.Store.create
-		revision: 11
+		revision: 12
 		adapter: adapter
