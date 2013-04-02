@@ -17,7 +17,8 @@
 		"convoy-stylus": "0.1.4",
 		"less": "1.3.3",
 		"uglify-js": "2.2.5",
-		"mongodb_s3_backup": "0.0.4"
+		"mongodb_s3_backup": "0.0.4",
+		"handlebars": "1.0.10"
 	},
 	"bin" : {
 		"mongodump" : "./bin/mongodump"

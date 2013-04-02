@@ -5,7 +5,6 @@ require './bootstrap'
 require './jquery.pnotify'
 
 
-# require './handlebars'
-
+window.Handlebars = require 'handlebars'
 require './ember'
 require './ember-data'
