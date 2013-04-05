@@ -10,7 +10,7 @@
 		"connect-redis": "1.4.5",
 		"jade": "0.28.2",
 		"nib": "0.9.1",
-		"mongoose": "3.6.0",
+		"mongoose": "3.6.4",
 		"nodemailer": "0.4.1",
 		"browserify": "git://github.com/pharcosyle/node-browserify.git",
 		"convoy": "0.4.1",
