@@ -21,7 +21,7 @@ mixin view(args)
 	else
 		| {{view !{args}}}
 
-mixin linkTo(args, text)
+mixin linkTo(args)
 	| {{#linkTo !{args}}}
 	if block
 		block
