@@ -1,0 +1,3 @@
+- When you don't need state in the URL seems like a computed property and implementing model() on the route could work just as well. I prefer using computed properties, unless the model should be recomputed with some frequency (navigating back to a route seems to trigger model() again).
+
+- lots of bindings stuff only SEEMS to work because the model data happens to be loaded already. Notable places this happens are the activity feed implicitly loading a few contacts and the search box loading many more
