@@ -60,10 +60,10 @@ module.exports = (Ember, DS, App, socket) ->
 		serialize: (deserialized) ->
 			deserialized
 		deserialize: (serialized) ->
+			validators = require('validator').validators
 			if serialized
-				date = new Date serialized
-				throw new Error 'Invalid date.' if isNaN date
-				return date
+				throw new Error 'Invalid date.' if not validators.isDate serialized
+				return new Date serialized
 	adapter.registerTransform 'string',
 		serialize: (value) -> value
 		deserialize: (value) -> value

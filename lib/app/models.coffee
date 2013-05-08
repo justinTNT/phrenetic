@@ -45,11 +45,12 @@ module.exports = (DS, App, schemas) ->
 				if schema.required and not value
 					return finish messages.required
 				switch schema.type
+					# TO-DO could these values ever be primitives (date/boolean/number) already and not string representations?
 					when String
 						if not _.isString value
 							return finish messages.format 'string'
 					when Date
-						if isNaN value
+						if validators.isDate value
 							return finish messages.format 'date'
 					when Boolean
 						if value not in ['true', 'false']
@@ -93,6 +94,7 @@ module.exports = (DS, App, schemas) ->
 
 	for schemaName, defintion of schemas
 		properties = {}
+		# TO-DO probably have to check for the shorthand "key: String" for "key: type: String"
 		for pathName, path of defintion
 			# TODO check if path is an array or literal/Types.Mixed. An array of ObjectId's is a hasMany.
 			properties[pathName] =
@@ -102,8 +104,9 @@ module.exports = (DS, App, schemas) ->
 					when Boolean then DS.attr 'boolean'
 					when Number then DS.attr 'number'
 					when Types.ObjectId then DS.belongsTo 'App.' + path.ref
-					else
-						throw new Error
+					# TODO other types, and being back throw new error
+					# else
+					# 	throw new Error
 			# TODO Make a generic 'verifyUniqueness'-type route for the 'unique' validator.
 		model = App[schemaName] = DS.Model.extend properties
 		model.reopen schema: defintion

@@ -1,5 +1,16 @@
 module.exports = (Ember, App) ->
 
+	App.findOne = (type, query) ->
+		if not query.conditions and not query.options
+			query =
+				conditions: query
+				options: {}
+		query.options.limit = 1
+		records = type.find query
+		records.one 'didLoad', ->
+			records.resolve records.get('firstObject')
+		records
+
 	App.refresh = (record) ->
 		App.store.findQuery record.constructor, record.get('id')
 
