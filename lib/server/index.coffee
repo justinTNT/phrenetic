@@ -54,7 +54,7 @@ module.exports = (projectRoot) ->
 		app.use app.router
 		app.use assets.pipeline.middleware()
 		app.use (req, res) ->
-			res.render 'index'
+			res.render 'main'
 
 	app.configure 'development', ->
 		app.use express.errorHandler()

@@ -18,6 +18,18 @@ module.exports = (setup) ->
 	App.ready = ->
 		$('#initializing').remove()
 
+	App.addObserver 'title', ->
+		document.title = App.get 'title'
+	App.styles = do ->
+		Styles = Ember.Object.extend
+			updateSheet: (->
+					href = '/' + @get('name') + '.css'
+					if timestamp = @get('timestamp')
+						href += '?timestamp=' + timestamp
+					$('#styles').attr 'href', href
+				).observes 'name', 'timestamp'
+		Styles.create()
+
 	io = require 'express.io/node_modules/socket.io/node_modules/socket.io-client'
 	socket = io.connect require('./util').baseUrl
 	socket.on 'error', ->
@@ -27,7 +39,7 @@ module.exports = (setup) ->
 	socket.on 'reloadApp', ->
 		window.location.reload()
 	socket.on 'reloadStyles', ->
-		$('#styles').attr 'href', '/app.css?timestamp=' + Date.now()
+		App.styles.set 'timestamp', Date.now()
 
 	require('./store') Ember, DS, App, socket
 	require('./ember') Ember, App
