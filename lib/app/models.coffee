@@ -50,7 +50,7 @@ module.exports = (DS, App, schemas) ->
 						if not _.isString value
 							return finish messages.format 'string'
 					when Date
-						if validators.isDate value
+						if not validators.isDate value
 							return finish messages.format 'date'
 					when Boolean
 						if value not in ['true', 'false']
