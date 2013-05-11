@@ -1,7 +1,7 @@
 module.exports = (Ember, App) ->
 
 	App.findOne = (type, query) ->
-		if not query.conditions and not query.options
+		if not query.conditions
 			query =
 				conditions: query
 				options: {}
@@ -13,6 +13,7 @@ module.exports = (Ember, App) ->
 
 	App.refresh = (record) ->
 		App.store.findQuery record.constructor, record.get('id')
+
 
 	App.Pagination = Ember.Mixin.create
 		rangeStart: 0
@@ -36,7 +37,7 @@ module.exports = (Ember, App) ->
 		nextPage: ->
 			@incrementProperty 'rangeStart', @get('itemsPerPage')
 
-		# prolly need this eventually
+		# Probably need this eventually.
 		# page: function() {
 		#   return (get(this, 'rangeStart') / get(this, 'rangeWindowSize')) + 1;
 		# }.property('rangeStart', 'rangeWindowSize').cacheable(),

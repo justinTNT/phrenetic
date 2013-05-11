@@ -1,4 +1,4 @@
-module.exports = (setup) ->
+module.exports = (preHook, postHook) ->
 
 	require '../vendor'
 
@@ -18,6 +18,20 @@ module.exports = (setup) ->
 	App.ready = ->
 		$('#initializing').remove()
 
+	io = require 'express.io/node_modules/socket.io/node_modules/socket.io-client'
+	socket = io.connect require('./util').baseUrl
+	socket.on 'error', ->
+		# TODO remove once I'm convinced this never happens
+		alert 'Unable to establish connection, please refresh.'
+		# window.location.reload()
+	socket.on 'reloadApp', ->
+		window.location.reload()
+	socket.on 'reloadStyles', ->
+		App.styles.set 'timestamp', Date.now()
+
+
+	preHook? Ember, DS, App, socket
+
 	App.addObserver 'title', ->
 		document.title = App.get 'title'
 	App.styles = do ->
@@ -30,18 +44,7 @@ module.exports = (setup) ->
 				).observes 'name', 'timestamp'
 		Styles.create()
 
-	io = require 'express.io/node_modules/socket.io/node_modules/socket.io-client'
-	socket = io.connect require('./util').baseUrl
-	socket.on 'error', ->
-		# TODO remove once I'm convinced this never happens
-		alert 'Unable to establish connection, please refresh.'
-		# window.location.reload()
-	socket.on 'reloadApp', ->
-		window.location.reload()
-	socket.on 'reloadStyles', ->
-		App.styles.set 'timestamp', Date.now()
-
 	require('./store') Ember, DS, App, socket
 	require('./ember') Ember, App
 
-	setup? Ember, DS, App, socket
+	postHook? Ember, DS, App, socket
