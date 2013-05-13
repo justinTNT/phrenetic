@@ -1,41 +1,39 @@
 module.exports = (Ember, DS, App, socket) ->
 	_ = require 'underscore'
+	util = require './util'
 
 
 	# Override this private helper to ensure that ember-data doesn't try to automatically pair up any inverses.
 	DS._inverseRelationshipFor = ->
 
 	adapter = DS.Adapter.create do ->
-		getTypeName = (type) ->
-			_.last type.toString().split('.')
-
 		find: (store, type, id) ->
-			socket.emit 'db', op: 'find', type: getTypeName(type), id: id, (json) =>
+			socket.emit 'db', op: 'find', type: util.typeName(type), id: id, (json) =>
 				Ember.run this, ->
 					@didFindRecord store, type, json, id
 		findMany: (store, type, ids, owner) ->
-			socket.emit 'db', op: 'find', type: getTypeName(type), ids: ids, (json) =>
+			socket.emit 'db', op: 'find', type: util.typeName(type), ids: ids, (json) =>
 				Ember.run this, ->
 					@didFindMany store, type, json
 		findQuery: (store, type, query, recordArray) ->
-			socket.emit 'db', op: 'find', type: getTypeName(type), query: query, (json) =>
+			socket.emit 'db', op: 'find', type: util.typeName(type), query: query, (json) =>
 				Ember.run this, ->
 					@didFindQuery store, type, json, recordArray
 		findAll: (store, type, since) ->
-			socket.emit 'db', op: 'find', type: getTypeName(type), (json) =>
+			socket.emit 'db', op: 'find', type: util.typeName(type), (json) =>
 				Ember.run this, ->
 					@didFindAll store, type, json
 
 		createRecord: (store, type, record) ->
-			socket.emit 'db', op: 'create', type: getTypeName(type), record: record.serialize(), (json) =>
+			socket.emit 'db', op: 'create', type: util.typeName(type), record: record.serialize(), (json) =>
 				Ember.run this, ->
 					@didCreateRecord store, type, record, json
 		updateRecord: (store, type, record) ->
-			socket.emit 'db', op: 'save', type: getTypeName(type), record: record.serialize(includeId: true), (json) =>
+			socket.emit 'db', op: 'save', type: util.typeName(type), record: record.serialize(includeId: true), (json) =>
 				Ember.run this, ->
 					@didSaveRecord store, type, record, json
 		deleteRecord: (store, type, record) ->
-			socket.emit 'db', op: 'remove', type: getTypeName(type), id: record.get('id'), =>
+			socket.emit 'db', op: 'remove', type: util.typeName(type), id: record.get('id'), =>
 				Ember.run this, ->
 					@didSaveRecord store, type, record
 

@@ -2,6 +2,11 @@ _ = require 'underscore'
 util = _.extend module.exports, require('../util')
 
 
+util.typeName = (object) ->
+	if object instanceof DS.Model
+		object = object.constructor
+	_.last object.toString().split('.')
+
 util.notify = (options) ->
 	_ = require 'underscore'
 	_.defaults options,
