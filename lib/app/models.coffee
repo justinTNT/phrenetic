@@ -97,6 +97,9 @@ module.exports = (DS, App, schemas) ->
 		# TO-DO probably have to check for the shorthand "key: String" for "key: type: String"
 		for pathName, path of defintion
 			# TODO check if path is an array or literal/Types.Mixed. An array of ObjectId's is a hasMany.
+			if _.isFunction path
+				# Shorthand schema path definition, just 'String', 'Date', etc.
+				path = type: path
 			properties[pathName] =
 				switch path.type
 					when String then DS.attr 'string'
