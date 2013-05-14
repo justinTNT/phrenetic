@@ -11,8 +11,8 @@ options = do ->
 		password: auth[1]
 		db: util.trim url.pathname, '/'
 	s3:
-		key: process.env.S3_ACCESS_KEY
-		secret: process.env.S3_SECRET_KEY
+		key: process.env.AWS_ACCESS_KEY
+		secret: process.env.AWS_SECRET_KEY
 		bucket: process.env.BACKUP_BUCKET
 
 backup = require 'mongodb_s3_backup'
