@@ -3,7 +3,7 @@ module.exports = (DS, App, schemas) ->
 	Types = require('../schemas').Types
 
 
-	DS.Model.reopen
+	BaseModel = DS.Model.extend
 		filter: (name) ->
 			schema = @get 'schema.' + name
 			value = @get name
@@ -117,5 +117,5 @@ module.exports = (DS, App, schemas) ->
 						# else
 						# 	throw new Error
 			# TODO Make a generic 'verifyUniqueness'-type route for the 'unique' validator.
-		model = App[schemaName] = DS.Model.extend properties
+		model = App[schemaName] = BaseModel.extend properties
 		model.reopen schema: definition
