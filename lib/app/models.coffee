@@ -57,9 +57,9 @@ module.exports = (DS, App, schemas) ->
 					when Number
 						if isNaN new Number(value)
 							return finish messages.format 'number'
-					# TODO when Types.ObjectId
-					else
-						throw new Error
+					# TODO when Types.ObjectId, bring back throw new Error
+					# else
+					# 	throw new Error
 				if (rule = schema.validate) and not rule(value)
 					return finish messages.format name
 				if (enumeration = schema.enum) and value not in enumeration
@@ -93,22 +93,29 @@ module.exports = (DS, App, schemas) ->
 
 	for schemaName, definition of schemas
 		properties = {}
-		# TO-DO probably have to check for the shorthand "key: String" for "key: type: String"
 		for pathName, path of definition
-			# TODO check if path is an array or literal/Types.Mixed. An array of ObjectId's is a hasMany.
 			if _.isFunction path
 				# Shorthand schema path definition, just 'String', 'Date', etc.
 				schemas[schemaName][pathName] = path = type: path
-			properties[pathName] =
-				switch path.type
-					when String then DS.attr 'string'
-					when Date then DS.attr 'date'
-					when Boolean then DS.attr 'boolean'
-					when Number then DS.attr 'number'
-					when Types.ObjectId then DS.belongsTo 'App.' + path.ref
-					# TODO other types, and being back throw new error
-					# else
-					# 	throw new Error
+			# TODO probably need some followup for this choice, which is probably too inclusive, at least putting something sensible in the
+			# schema for it (instead of whatever nested junk is already there).
+			if not path.type
+				if _.isObject(path)
+					properties[pathName] = DS.attr 'object'
+				if _.isArray(path)
+					properties[pathName] = DS.attr 'array'
+			else
+				properties[pathName] =
+					switch path.type
+						# TODO check if path is an array or literal/Types.Mixed. An array of ObjectId's is a hasMany.
+						when String then DS.attr 'string'
+						when Date then DS.attr 'date'
+						when Boolean then DS.attr 'boolean'
+						when Number then DS.attr 'number'
+						when Types.ObjectId then DS.belongsTo 'App.' + path.ref
+						# TODO other types, and being back throw new error
+						# else
+						# 	throw new Error
 			# TODO Make a generic 'verifyUniqueness'-type route for the 'unique' validator.
 		model = App[schemaName] = DS.Model.extend properties
 		model.reopen schema: definition

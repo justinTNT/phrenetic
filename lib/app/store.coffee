@@ -47,13 +47,18 @@ module.exports = (Ember, DS, App, socket) ->
 					hash[key] = ids
 
 
-	# Technically this probably shouldn't be on the adapter.
+	# Technically these probably shouldn't be on the adapter.
 	adapter.registerTransform 'array',
 		serialize: (deserialized) ->
 			deserialized
 		deserialize: (serialized) ->
 			serialized
-	# TO-DO workarounds for JSONSerializer turning undefined into null
+	adapter.registerTransform 'object',
+		serialize: (deserialized) ->
+			deserialized
+		deserialize: (serialized) ->
+			serialized
+	# TO-DO Workarounds for JSONSerializer turning undefined into null, remove when ember-data stops doing this.
 	adapter.registerTransform 'date',
 		serialize: (deserialized) ->
 			deserialized

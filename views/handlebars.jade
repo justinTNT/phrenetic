@@ -13,6 +13,11 @@ mixin each(args)
 	block
 	| {{/each}}
 
+mixin collection(args)
+	| {{#collection !{args}}}
+	block
+	| {{/collection}}
+
 mixin view(args)
 	if block
 		| {{#view !{args}}}
@@ -30,10 +35,3 @@ mixin linkTo(args)
 
 mixin else
 	| {{else}}
-
-
-//- TO-DO Remove this once ember is upgraded and uses of the #collection helper removed.
-mixin collection(args)
-	| {{#collection !{args}}}
-	block
-	| {{/collection}}
