@@ -55,7 +55,7 @@ module.exports = (DS, App, schemas) ->
 						if value not in [true, false, 'true', 'false']
 							return finish messages.format 'boolean'
 					when Number
-						if not parseFloat value
+						if not new Number(value)
 							return finish messages.format 'number'
 					# TODO when Types.ObjectId
 					else
