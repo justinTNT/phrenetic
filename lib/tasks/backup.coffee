@@ -13,7 +13,7 @@ options = do ->
 	s3:
 		key: process.env.AWS_ACCESS_KEY
 		secret: process.env.AWS_SECRET_KEY
-		bucket: process.env.BACKUP_BUCKET
+		bucket: process.env.S3_BACKUP_BUCKET
 
 backup = require 'mongodb_s3_backup'
 backup.sync options.mongodb, options.s3
