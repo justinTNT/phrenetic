@@ -47,4 +47,6 @@ module.exports = (preHook, postHook) ->
 	require('./store') Ember, DS, App, socket
 	require('./ember') Ember, App
 
+	require('./handlebars') Ember, Handlebars
+
 	postHook? Ember, DS, App, socket

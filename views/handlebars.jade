@@ -35,3 +35,12 @@ mixin linkTo(args)
 
 mixin else
 	| {{else}}
+
+
+
+//- Custom helpers.
+
+mixin is(args)
+	| {{#is !{args}}}
+	block
+	| {{/is}}
