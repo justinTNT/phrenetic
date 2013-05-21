@@ -1,8 +1,10 @@
 module.exports = (Ember, App) ->
 
-	App.findOne = (type, query) ->
+	App.findOne = (type, query = {}) ->
+		util = require './util'
 		query = util.normalizeQuery query
 		query.options.limit = 1
+		
 		records = type.find query
 		records.one 'didLoad', ->
 			records.resolve records.get('firstObject')
