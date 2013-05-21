@@ -119,3 +119,4 @@ module.exports = (DS, App, schemas) ->
 			# TODO Make a generic 'verifyUniqueness'-type route for the 'unique' validator.
 		model = App[schemaName] = BaseModel.extend properties
 		model.reopen schema: definition
+		model.reopenClass schema: definition
