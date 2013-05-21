@@ -4,11 +4,19 @@ module.exports = (Ember, App) ->
 		util = require './util'
 		query = util.normalizeQuery query
 		query.options.limit = 1
-		
+
+		# TO-DO remove this old implementation if I never figue out how it was supposed to work: http://progfu.com/post/40016169330/how-to-find-a-model-by-any-attribute-in-ember-js
+		# records = type.find query
+		# records.one 'didLoad', ->
+		# 	records.resolve records.get('firstObject')
+		# records
+		single = Ember.ObjectProxy.create()
 		records = type.find query
 		records.one 'didLoad', ->
-			records.resolve records.get('firstObject')
-		records
+			console.log records.get('firstObject')
+			single.set 'content', records.get('firstObject')
+		single
+
 
 	App.refresh = (record) ->
 		App.store.findQuery record.constructor, record.get('id')
