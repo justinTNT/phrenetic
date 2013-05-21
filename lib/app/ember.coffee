@@ -1,10 +1,7 @@
 module.exports = (Ember, App) ->
 
 	App.findOne = (type, query) ->
-		if not query.conditions
-			query =
-				conditions: query
-				options: {}
+		query = util.normalizeQuery query
 		query.options.limit = 1
 		records = type.find query
 		records.one 'didLoad', ->

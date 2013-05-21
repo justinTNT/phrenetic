@@ -16,7 +16,7 @@ module.exports = (Ember, DS, App, socket) ->
 				Ember.run this, ->
 					@didFindMany store, type, json
 		findQuery: (store, type, query, recordArray) ->
-			socket.emit 'db', op: 'find', type: util.typeName(type), query: query, (json) =>
+			socket.emit 'db', op: 'find', type: util.typeName(type), query: util.normalizeQuery(query), (json) =>
 				Ember.run this, ->
 					@didFindQuery store, type, json, recordArray
 		findAll: (store, type, since) ->
