@@ -13,7 +13,6 @@ module.exports = (Ember, App) ->
 		single = Ember.ObjectProxy.create()
 		records = type.find query
 		records.one 'didLoad', ->
-			console.log records.get('firstObject')
 			single.set 'content', records.get('firstObject')
 		single
 
