@@ -4,7 +4,7 @@ module.exports = (Ember, Handlebars) ->
 
 	Ember.Handlebars.registerHelper 'is', (path, options) ->
 		view = Ember.View.create isVisible: false
-		view.registerObserver this, path, ->
+		observer = =>
 			value = @get path
 			visible = false
 			if (values = options.hash.values?.split(', ')) and (value in values)
@@ -12,9 +12,11 @@ module.exports = (Ember, Handlebars) ->
 			if value is options.hash.value
 				visible = true
 			view.set 'isVisible', visible
+		view.registerObserver this, path, observer
+		observer()
 		Ember.Handlebars.ViewHelper.helper this, view, options
 
-		# This is the way I'd like to do it but it doesn't work
+		# TO-DO This is the way I'd like to do it but it doesn't work. At least clean up what I have.
 		# if values = options.hash.values?.split(', ')
 		# 	if value in values
 		# 		return options.fn this
