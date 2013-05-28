@@ -35,7 +35,7 @@ module.exports = (preHook, postHook) ->
 	App.addObserver 'title', ->
 		title = App.get 'title'
 		document.title = title
-		$('meta[property="og:title"]').attr 'content', title
+		# $('meta[property="og:title"]').attr 'content', title
 	App.styles = do ->
 		Styles = Ember.Object.extend
 			updateSheet: (->
