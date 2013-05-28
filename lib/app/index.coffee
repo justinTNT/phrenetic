@@ -33,7 +33,9 @@ module.exports = (preHook, postHook) ->
 	preHook? Ember, DS, App, socket
 
 	App.addObserver 'title', ->
-		document.title = App.get 'title'
+		title = App.get 'title'
+		document.title = title
+		$('meta[property="og:title"]').attr 'content', title
 	App.styles = do ->
 		Styles = Ember.Object.extend
 			updateSheet: (->
