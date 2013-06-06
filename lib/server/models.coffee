@@ -19,9 +19,7 @@ exports.frame = (schemas) ->
 		options = {}
 		if schema.base
 			# create = frames[schema.base].extend
-			# console.log require('mongoose/lib/util').toCollectionName frames[schema.base]
-			# options.collection = require('mongoose/lib/util').toCollectionName frames[schema.base]
-			options.collection = 'products'
+			options.collection = require('mongoose/lib/utils').toCollectionName schema.base
 			_ = require 'underscore'
 			baseSchema = _.find schemas, (candidate) ->
 				candidate.name is schema.base
