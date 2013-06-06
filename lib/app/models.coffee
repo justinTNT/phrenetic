@@ -103,7 +103,7 @@ module.exports = (DS, App, schemas) ->
 			).property()
 
 
-	for schema in schemas
+	for schema in schemas.all()
 		properties = {}
 		for pathName, path of schema.definition
 			if _.isFunction path
@@ -132,18 +132,9 @@ module.exports = (DS, App, schemas) ->
 		baseClass = BaseModel
 		if schema.base
 			baseClass = App[schema.base]
-		model = App[schema.name] = baseClass.extend properties
-		if schema.base
 			_s = require 'underscore.string'
 			DS.Adapter.configure 'App.' + schema.name, alias: _s.underscored(schema.name)
-
-
-		# TO-DO copypasta from server/models
-		if schema.base
-			baseSchema = _.find schemas, (candidate) ->
-				candidate.name is schema.base
-			_.extend schema.definition, baseSchema.definition
-
-
+			_.extend schema.definition, schemas[schema.base].definition
+		model = App[schema.name] = baseClass.extend properties
 		model.reopen schema: schema.definition
 		model.reopenClass schema: schema.definition

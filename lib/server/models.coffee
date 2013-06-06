@@ -13,7 +13,7 @@ exports.frame = (schemas) ->
 		Types[name] = Schema.Types[name]
 
 	frames = {}
-	for schema in schemas
+	for schema in schemas.all()
 		create = (definition, options) ->
 			new Schema definition, options
 		options = {}
@@ -21,9 +21,7 @@ exports.frame = (schemas) ->
 			# create = frames[schema.base].extend
 			options.collection = require('mongoose/lib/utils').toCollectionName schema.base
 			_ = require 'underscore'
-			baseSchema = _.find schemas, (candidate) ->
-				candidate.name is schema.base
-			_.extend schema.definition, baseSchema.definition
+			_.extend schema.definition, schemas[schema.base].definition
 		if schema.definition._type
 			options.discriminatorKey = '_type'
 		frame = create schema.definition, options
