@@ -1,5 +1,6 @@
 # Note: "Frame" means mongoose schema. I just picked another term so I wouldn't get them confused with my schemas.
 
+require 'mongoose-schema-extend'
 db = require('./services').getDb()
 
 
@@ -12,10 +13,27 @@ exports.frame = (schemas) ->
 		Types[name] = Schema.Types[name]
 
 	frames = {}
-	for name, schema of schemas
-		frame = new Schema schema
+	for schema in schemas
+		create = (definition, options) ->
+			new Schema definition, options
+		options = {}
+		if schema.base
+			# create = frames[schema.base].extend
+			console.log require('mongoose/lib/util').toCollectionName frames[schema.base]
+			options.collection = require('mongoose/lib/util').toCollectionName frames[schema.base]
+			_ = require 'underscore'
+			baseSchema = _.find schemas, (candidate) ->
+				candidate.name is schema.base
+			_.extend schema.definition, baseSchema.definition
+		if schema.definition._type
+			options.discriminatorKey = '_type'
+		frame = create schema.definition, options
 		frame.set 'toJSON', getters: true   # To make 'id' included in json serialization for the data API.
-		frames[name] = frame
+		frames[schema.name] = frame
+		if schema.base
+			frame.pre 'save', (next) ->
+				@_type = @constructor.modelName
+				next()
 	frames
 
 

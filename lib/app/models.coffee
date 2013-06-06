@@ -1,5 +1,6 @@
 module.exports = (DS, App, schemas) ->
 	_ = require 'underscore'
+	util = require './util'
 	Types = require('../schemas').Types
 
 
@@ -91,12 +92,23 @@ module.exports = (DS, App, schemas) ->
 				.isEmpty()
 				.value()
 
-	for schemaName, definition of schemas
+		typeName: (->
+				util.typeName this
+			).property()
+
+	BaseModel.reopenClass
+		# TO-DO kind of copypasta
+		typeName: (->
+				util.typeName this
+			).property()
+
+
+	for schema in schemas
 		properties = {}
-		for pathName, path of definition
+		for pathName, path of schema.definition
 			if _.isFunction path
 				# Shorthand schema path definition, just 'String', 'Date', etc.
-				schemas[schemaName][pathName] = path = type: path
+				schemas[schema.name][pathName] = path = type: path
 			# TODO probably need some followup for this choice, which is probably too inclusive, at least putting something sensible in the
 			# schema for it (instead of whatever nested junk is already there).
 			if not path.type
@@ -117,6 +129,21 @@ module.exports = (DS, App, schemas) ->
 						# else
 						# 	throw new Error
 			# TODO Make a generic 'verifyUniqueness'-type route for the 'unique' validator.
-		model = App[schemaName] = BaseModel.extend properties
-		model.reopen schema: definition
-		model.reopenClass schema: definition
+		baseClass = BaseModel
+		if schema.base
+			baseClass = App[schema.base]
+		model = App[schema.name] = baseClass.extend properties
+		if schema.base
+			_s = require 'underscore.string'
+			DS.Adapter.configure 'App.' + schema.name, alias: _s.underscored(schema.name)
+
+
+		# TO-DO copypasta from server/models
+		if schema.base
+			baseSchema = _.find schemas, (candidate) ->
+				candidate.name is schema.base
+			_.extend schema.definition, baseSchema.definition
+
+
+		model.reopen schema: schema.definition
+		model.reopenClass schema: schema.definition
