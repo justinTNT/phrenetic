@@ -2,7 +2,7 @@
 	"name": "phrenetic",
 	"version": "0.1.0",
 	"dependencies": {
-		"coffee-script": "1.6.2",
+		"coffee-script": "1.6.3",
 		"longjohn": "0.2.0",
 		"underscore": "1.4.4",
 		"underscore.string": "2.3.1",
