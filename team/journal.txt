@@ -1,3 +1,4 @@
+- Seems like mongoose can only do arrays of basic SchemaTypes or Sub-Documents (have and _id). This makes sense, maybe it couldn't do individual element change for objects that aren't subdocuments
 - Do cascade-delete stuff with 'pre' mongoose middleware and not 'post', so if something goes wrong the document will still be there and you can try again, and parallel for efficiency
 - my custom 'array' and 'object' transforms won't have automatic dirtyness tracking.
 - "class" is valid in the template, "classNames" is valid in the view code. "classNameBindings" works on linkTo helper
