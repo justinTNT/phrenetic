@@ -17,6 +17,8 @@ module.exports = (DS, App, schemas) ->
 				value = value.toLowerCase()
 			if schema.uppercase
 				value = value.toUpperCase()
+			if set = schema.set
+				value = set value
 			@set name, value
 		validate: do ->
 			validators = require('validator').validators
