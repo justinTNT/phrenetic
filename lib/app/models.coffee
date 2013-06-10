@@ -117,7 +117,7 @@ module.exports = (DS, App, schemas) ->
 				if _.isObject(path)
 					properties[pathName] = DS.attr 'object'
 				if _.isArray(path)
-					properties[pathName] = DS.attr 'array'
+					properties[pathName] = DS.attr 'array', defaultValue: []
 			else
 				properties[pathName] =
 					switch path.type
