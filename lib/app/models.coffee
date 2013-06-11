@@ -110,10 +110,12 @@ module.exports = (DS, App, schemas) ->
 		for pathName, path of schema.definition
 			if _.isFunction path
 				# Shorthand schema path definition, just 'String', 'Date', etc.
-				schemas[schema.name][pathName] = path = type: path
+				schemas[schema.name].definition[pathName] = path = type: path
 			# TODO probably need some followup for this choice, which is probably too inclusive, at least putting something sensible in the
 			# schema for it (instead of whatever nested junk is already there).
 			if not path.type
+				# Nested schema or array. Either way remove the path definition.
+				schemas[schema.name].definition[pathName] = {}
 				if _.isObject(path)
 					properties[pathName] = DS.attr 'object'
 				if _.isArray(path)
