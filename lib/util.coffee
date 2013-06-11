@@ -11,4 +11,4 @@ exports.trim = (string, characters) ->
 
 # Dasherizing from camelcase leaves a preceding dash if the first letter is uppercase.
 exports.dasherize = (string) ->
-	util.trim(_s.dasherize(folder), '-')
+	exports.trim(_s.dasherize(string), '-')
