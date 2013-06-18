@@ -136,6 +136,10 @@ module.exports = (Ember, App) ->
 				@filter field
 				@validate field, cb
 			, cb
+		validateSuccess: (cb) ->
+			@validateAll =>
+				if not @hasErrors()
+					cb()
 		hasErrors: ->
 			not _.chain(@get('errors'))
 				.values()
