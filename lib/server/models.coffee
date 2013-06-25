@@ -2,6 +2,7 @@
 
 require 'mongoose-schema-extend'
 db = require('./services').getDb()
+_ = require('underscore')
 
 
 exports.frame = (schemas) ->
@@ -24,6 +25,11 @@ exports.frame = (schemas) ->
 			_.extend schema.definition, schemas[schema.base].definition
 		if schema.definition._type
 			options.discriminatorKey = '_type'
+		for key of schema.definition							# each attribute on the schema
+			val = schema.definition[key]
+			if _.isArray val then val = val[0]					# if its an array, look at contents
+			if val.type and _.isEmpty(val.type) and val.ref		# if it matches the O'Id {} placeholder
+				val.type = Schema.Types.ObjectId				# swap in the real thing
 		frame = create schema.definition, options
 		frame.set 'toJSON', getters: true   # To make 'id' included in json serialization for the data API.
 		frames[schema.name] = frame
