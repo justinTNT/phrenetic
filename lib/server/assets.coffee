@@ -34,13 +34,12 @@ module.exports = (root, projectRoot, app, variables) ->
 			res.header 'Content-Type', 'application/javascript'
 			res.send code
 
-	pipeline = require('convoy')
-		watch: process.env.NODE_ENV is 'development'
-		'app.css':
-			main: projectRoot + '/styles'
+	pipeline = require('convoy') do ->
+		createConfig = (name) ->
+			main: projectRoot + '/styles/' + name
 			packager: require 'convoy-stylus'
 			postprocessors: [ (asset, context, done) ->
-				basePath = projectRoot + '/styles/base.less'
+				basePath = projectRoot + '/styles/' + name + 'Base.less'
 				context.watchPath basePath
 				fs = require 'fs'
 				fs.readFile basePath, 'utf8', (err, body) ->
@@ -56,6 +55,11 @@ module.exports = (root, projectRoot, app, variables) ->
 			]
 			minify: process.env.NODE_ENV is 'production'
 			autocache: process.env.NODE_ENV is 'development'
+
+		watch: process.env.NODE_ENV is 'development'
+		'site.css': createConfig('site')
+		'admin.css': createConfig('admin')
+			
 
 
 	bundle: bundle

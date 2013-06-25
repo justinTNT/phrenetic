@@ -1,4 +1,4 @@
-module.exports = (setup) ->
+module.exports = (preHook, postHook) ->
 
 	require '../vendor'
 
@@ -27,9 +27,28 @@ module.exports = (setup) ->
 	socket.on 'reloadApp', ->
 		window.location.reload()
 	socket.on 'reloadStyles', ->
-		$('#styles').attr 'href', '/app.css?timestamp=' + Date.now()
+		App.styles.set 'timestamp', Date.now()
+
+
+	preHook? Ember, DS, App, socket
+
+	App.addObserver 'title', ->
+		title = App.get 'title'
+		document.title = title
+		# $('meta[property="og:title"]').attr 'content', title
+	App.styles = do ->
+		Styles = Ember.Object.extend
+			updateSheet: (->
+					href = '/' + @get('name') + '.css'
+					if timestamp = @get('timestamp')
+						href += '?timestamp=' + timestamp
+					$('#styles').attr 'href', href
+				).observes 'name', 'timestamp'
+		Styles.create()
 
 	require('./store') Ember, DS, App, socket
 	require('./ember') Ember, App
 
-	setup? Ember, DS, App, socket
+	require('./handlebars') Ember, Handlebars
+
+	postHook? Ember, DS, App, socket

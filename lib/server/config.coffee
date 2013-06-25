@@ -7,7 +7,7 @@ module.exports = (projectRoot) ->
 	try
 		local = require projectRoot + '/config-local'
 		scopes.push local
-	catch e
+	catch
 
 	for scope in scopes
 		for variable of scope

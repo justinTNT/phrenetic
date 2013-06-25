@@ -2,6 +2,19 @@ _ = require 'underscore'
 util = _.extend module.exports, require('../util')
 
 
+util.typeName = (object) ->
+	if object instanceof DS.Model
+		object = object.constructor
+	_.last object.toString().split('.')
+
+util.normalizeQuery = (query) ->
+	normalized = 
+		conditions: query.conditions or {}
+		options: query.options or {}
+	if not query.conditions and not query.options
+		normalized.conditions = query
+	normalized
+
 util.notify = (options) ->
 	_ = require 'underscore'
 	_.defaults options,

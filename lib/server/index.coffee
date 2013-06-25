@@ -49,12 +49,12 @@ module.exports = (projectRoot) ->
 		# Hook for project-specific middleware.
 		try
 			require(projectRoot + '/lib/server/middleware') app
-		catch e
+		catch
 
 		app.use app.router
 		app.use assets.pipeline.middleware()
 		app.use (req, res) ->
-			res.render 'index'
+			res.render 'main'
 
 	app.configure 'development', ->
 		app.use express.errorHandler()

@@ -1,0 +1,8 @@
+- Seems like mongoose can only do arrays of basic SchemaTypes or Sub-Documents (have and _id). This makes sense, maybe it couldn't do individual element change for objects that aren't subdocuments
+- Do cascade-delete stuff with 'pre' mongoose middleware and not 'post', so if something goes wrong the document will still be there and you can try again, and parallel for efficiency
+- my custom 'array' and 'object' transforms won't have automatic dirtyness tracking.
+- "class" is valid in the template, "classNames" is valid in the view code. "classNameBindings" works on linkTo helper
+- this thing says that if the model of a route has state isLoading it will wait until it doesn't, this would be helpful for preventing things like the "All done!" screen on the classify page showing up while the queue loads: http://progfu.com/post/40016169330/how-to-find-a-model-by-any-attribute-in-ember-js
+- When you don't need state in the URL seems like a computed property and implementing model() on the route could work just as well. I prefer using computed properties. I was originally going to use model() for stuff that should be recomputed with some frequency (navigating back to a route seems to trigger model() again) but this won't work for components / non-routable things.
+
+- lots of bindings stuff only SEEMS to work because the model data happens to be loaded already. Notable places this happens are the activity feed implicitly loading a few contacts and the search box loading many more
