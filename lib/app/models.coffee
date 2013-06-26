@@ -26,7 +26,9 @@ module.exports = (DS, App, schemas) ->
 				if _.isObject(path)
 					properties[pathName] = DS.attr 'object'
 				if _.isArray(path)
-					properties[pathName] = DS.attr 'array', defaultValue: []
+					if (ref = path[0].ref)
+						properties[pathName] = DS.hasMany "App.#{ref}", defaultValue: []
+					else properties[pathName] = DS.attr 'array', defaultValue: []
 			else
 				properties[pathName] =
 					switch path.type
@@ -37,12 +39,7 @@ module.exports = (DS, App, schemas) ->
 						when Number then DS.attr 'number'
 						when Types.ObjectId then DS.belongsTo 'App.' + path.ref
 						# TODO other types, and being back throw new error
-						else
-							# TODO this will set up the hasMany but validation won't work. Prolly just replace the path mapping with an empty object.
-							if _.isArray(path) and (ref = path[0].ref)
-								DS.hasMany 'App.' + ref
-							else
-								throw new Error
+						else throw new Error "unrecognised type #{path.type}"
 			# TODO Make a generic 'verifyUniqueness'-type route for the 'unique' validator.
 		baseClass = BaseModel
 		if schema.base
