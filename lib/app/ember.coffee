@@ -1,5 +1,7 @@
-module.exports = (Ember, App) ->
+module.exports = (Ember, DS, App) ->
 	_ = require 'underscore'
+	async = require 'async'
+	Types = require('../schemas').Types
 
 
 	App.findOne = (type, query = {}) ->
@@ -13,6 +15,7 @@ module.exports = (Ember, App) ->
 		# 	records.resolve records.get('firstObject')
 		# records
 		single = Ember.ObjectProxy.create()
+		console.dir query
 		records = type.find query
 		records.one 'didLoad', ->
 			single.set 'content', records.get('firstObject')
@@ -55,21 +58,29 @@ module.exports = (Ember, App) ->
 
 
 	App.Validatable = Ember.Mixin.create
-		filter: (name) ->
-			schema = @get 'schema.' + name
-			value = @get name
-			if not value
-				return
-			if schema.trim
-				util = require './util'
-				value = util.trim value
-			if schema.lowercase
-				value = value.toLowerCase()
-			if schema.uppercase
-				value = value.toUpperCase()
-			if set = schema.set
-				value = set value
-			@set name, value
+		filter: do ->
+			filterValue = (value, schema) ->
+				if schema.trim
+					util = require './util'
+					value = util.trim value
+				if schema.lowercase
+					value = value.toLowerCase()
+				if schema.uppercase
+					value = value.toUpperCase()
+				if set = schema.set
+					value = set value
+				value
+			(name) ->
+				schema = @get 'schema.' + name
+				value = @get name
+				if not value
+					return
+				if schema.type is Array
+					value = value.map (elementValue) ->
+						filterValue elementValue, schema.element
+				else
+					value = filterValue value, schema
+				@set name, value
 		validate: do ->
 			validators = require('validator').validators
 			messages =
@@ -81,6 +92,47 @@ module.exports = (Ember, App) ->
 					'That ' + type + ' is in use.'
 				min: 'Too low.'
 				max: 'Too high.'
+			validateValue = (name, value, schema, cb) ->
+				if not value and ((not schema.required) or (schema.default))
+					# Stop validating if the field isn't set and it's not required / will be populated with a default value later.
+					return cb()
+				if schema.required and not value
+					return cb messages.required
+				switch schema.type
+					when String
+						if not _.isString value
+							return cb messages.format 'string'
+					when Date
+						if not validators.isDate value
+							return cb messages.format 'date'
+					when Boolean
+						if value not in [true, false, 'true', 'false']
+							return cb messages.format 'boolean'
+					when Number
+						if isNaN new Number(value)
+							return cb messages.format 'number'
+					when Types.ObjectId
+						if not (value instanceof DS.Model)
+							return cb messages.format 'reference'
+					when Types.Mixed then ;
+					else
+						throw new Error
+				if (rule = schema.validate) and not rule(value)
+					return cb messages.format name
+				if (enumeration = schema.enum) and value not in enumeration
+					return cb messages.enum
+				if (match = schema.match) and not match.test value
+					return cb messages.format name
+				if (min = schema.min) and value < min
+					return cb messages.min
+				if (max = schema.max) and value > max
+					return cb messages.max
+				# TODO have a route for checking uniqueness, something like this:
+				# socket.emit 'verifyUniqueness', field: 'email', value: email, (duplicate) ->
+				# 	if duplicate
+				# 		return cb messages.unique 'email'
+				# 	cb()
+				cb()
 			(name, cb) ->
 				schema = @get 'schema.' + name
 				value = @get name
@@ -92,45 +144,21 @@ module.exports = (Ember, App) ->
 					# App.store.recordWasInvalid this, errors
 					@set 'errors.' + name, message or null
 					cb?()
-				if not value and ((not schema.required) or (schema.default))
-					# Stop validating if the field isn't set and it's not required / will be populated with a default value later.
-					return finish()
-				if schema.required and not value
-					return finish messages.required
-				switch schema.type
-					when String
-						if not _.isString value
-							return finish messages.format 'string'
-					when Date
-						if not validators.isDate value
-							return finish messages.format 'date'
-					when Boolean
-						if value not in [true, false, 'true', 'false']
-							return finish messages.format 'boolean'
-					when Number
-						if isNaN new Number(value)
-							return finish messages.format 'number'
-					# TODO when Types.ObjectId, bring back throw new Error
-					# else
-					# 	throw new Error
-				if (rule = schema.validate) and not rule(value)
-					return finish messages.format name
-				if (enumeration = schema.enum) and value not in enumeration
-					return finish messages.enum
-				if (match = schema.match) and not match.test value
-					return finish messages.format name
-				if (min = schema.min) and value < min
-					return finish messages.min
-				if (max = schema.max) and value > max
-					return finish messages.max
-				# TODO have a route for checking uniqueness, something like this:
-				# socket.emit 'verifyUniqueness', field: 'email', value: email, (duplicate) ->
-				# 	if duplicate
-				# 		return finish messages.unique 'email'
-				# 	finish()
-				finish()
+
+				# TODO handle nested definitions
+				if schema.type is Array
+					async.each value, (elementValue, cb) =>
+						validateValue 'element', elementValue, schema.element, cb   # TO-DO The name 'element' isn't very helpful to the user.
+					, (message) ->
+						# async.each expects the first argument to each item callback to be a an error, which if encountered will immediately
+						# call the main callback with that error. In our case the first argument is a validation error message so there will be
+						# one at most.
+						if message
+							message = 'Error on item: ' + message
+						finish message
+				else
+					validateValue name, value, schema, finish
 		validateAll: (cb) ->
-			async = require 'async'
 			fields = _.keys @get('schema')
 			async.each fields, (field, cb) =>
 				@filter field

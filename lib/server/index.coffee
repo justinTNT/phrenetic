@@ -10,7 +10,7 @@ module.exports = (projectRoot) ->
 		url = require('url').parse process.env.REDISTOGO_URL
 		host: url.hostname
 		port: url.port
-		pass: url.auth.split(':')[1]
+		pass: url.auth?.split(':')[1]
 
 
 	app.configure ->

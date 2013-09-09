@@ -15,35 +15,34 @@ module.exports = (DS, App, schemas) ->
 	for schema in schemas.all()
 		properties = {}
 		for pathName, path of schema.definition
+			isArray = _.isArray path
+			if isArray
+				path = path[0]
+				schemas[schema.name].definition[pathName] =
+					type: Array
+					element: path
 			if _.isFunction path
 				# Shorthand schema path definition, just 'String', 'Date', etc.
-				schemas[schema.name].definition[pathName] = path = type: path
-			# TODO probably need some followup for this choice, which is probably too inclusive, at least putting something sensible in the
-			# schema for it (instead of whatever nested junk is already there).
-			if not path.type
-				# Nested schema or array. Either way remove the path definition.
-				schemas[schema.name].definition[pathName] = {}
-				if _.isObject(path)
-					properties[pathName] = DS.attr 'object'
-				if _.isArray(path)
-					properties[pathName] = DS.attr 'array', defaultValue: []
-			else
-				properties[pathName] =
-					switch path.type
-						# TODO check if path is an array or literal/Types.Mixed. An array of ObjectId's is a hasMany.
-						when String then DS.attr 'string'
-						when Date then DS.attr 'date'
-						when Boolean then DS.attr 'boolean'
-						when Number then DS.attr 'number'
-						when Types.ObjectId then DS.belongsTo 'App.' + path.ref
-						# TODO other types, and being back throw new error
-						else
-							# TODO this will set up the hasMany but validation won't work. Prolly just replace the path mapping with an empty object.
-							if _.isArray(path) and (ref = path[0].ref)
-								DS.hasMany 'App.' + ref
-							else
-								throw new Error
-			# TODO Make a generic 'verifyUniqueness'-type route for the 'unique' validator.
+				throw new Error 'Specify the type key.'
+			properties[pathName] = do ->
+				if isArray
+					if ref = path.ref
+						return DS.hasMany 'App.' + ref
+					return DS.attr 'array', defaultValue: []
+				if _.isObject(path) and not path.type
+					if _.isEmpty
+						schemas[schema.name].definition[pathName] = type: Types.Mixed   # Empty object is the same as Mixed.
+					# TODO handle nested definitions eventually
+					return DS.attr 'object'
+				switch path.type
+					when String then DS.attr 'string'
+					when Date then DS.attr 'date'
+					when Boolean then DS.attr 'boolean'
+					when Number then DS.attr 'number'
+					when Types.ObjectId then DS.belongsTo 'App.' + path.ref
+					when Types.Mixed then DS.attr 'object'
+					else
+						throw new Error
 		baseClass = BaseModel
 		if schema.base
 			baseClass = App[schema.base]

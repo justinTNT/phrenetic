@@ -15,25 +15,10 @@ module.exports = (Ember, DS, App, socket) ->
 			socket.emit 'db', op: 'find', type: util.typeName(type), ids: ids, (json) =>
 				Ember.run this, ->
 					@didFindMany store, type, json
-
 		findQuery: (store, type, query, recordArray) ->
 			socket.emit 'db', op: 'find', type: util.typeName(type), query: util.normalizeQuery(query), (json) =>
 				Ember.run this, ->
-					for item of json
-						if not json[item].length or json[item].length < 666
-							return @didFindQuery store, type, json, recordArray
-					item = _.first _.keys json
-					items = json[item]
-					f = (counter=0) =>
-						Ember.run.next this, =>
-							json[item] = items.slice counter*100, (counter+1)*100
-							thisArray = DS.AdapterPopulatedRecordArray.create {type:type, query:query, content:Ember.A([]), store:App.store}
-							@didFindQuery store, type, json, thisArray
-							recordArray.set 'content', recordArray.get('content').concat thisArray.get('content')
-							counter += 100
-							if counter*100 < items.length then f counter
-					f()
-
+					@didFindQuery store, type, json, recordArray
 		findAll: (store, type, since) ->
 			socket.emit 'db', op: 'find', type: util.typeName(type), (json) =>
 				Ember.run this, ->
