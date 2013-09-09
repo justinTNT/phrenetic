@@ -15,7 +15,6 @@ module.exports = (Ember, DS, App) ->
 		# 	records.resolve records.get('firstObject')
 		# records
 		single = Ember.ObjectProxy.create()
-		console.dir query
 		records = type.find query
 		records.one 'didLoad', ->
 			single.set 'content', records.get('firstObject')
