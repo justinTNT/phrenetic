@@ -7,8 +7,7 @@ module.exports = (root, projectRoot, app, variables) ->
 		watch: process.env.NODE_ENV is 'development'
 		# debug: true
 	bundle.register 'post', (body) ->
-		if process.env.NODE_ENV is 'development'
-			return body
+		if process.env.NODE_ENV isnt 'production' then return body		# maybe should test for NODE_ENV is 'development'
 		require('uglify-js').minify(body, fromString: true).code
 	bundle.register '.jade', (body, filename) ->
 		include = 'include ' + path.relative(path.dirname(filename), path.join(root, 'views/handlebars')) + '\n'
