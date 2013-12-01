@@ -2,7 +2,7 @@ module.exports = (root, projectRoot, app, variables) ->
 	path = require 'path'
 
 
-	bundle = require('browserify')
+	bundle = require('jtntbrowserifytmp')
 		exports: 'process'
 		watch: process.env.NODE_ENV is 'development'
 		# debug: true
