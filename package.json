@@ -13,7 +13,7 @@
     "mongoose": "3.6.11",
     "mongoose-schema-extend": "0.1.3",
     "nodemailer": "0.4.4",
-    "jtntbrowserifytmp": "git://github.com/justinTNT/jtntbrowserifytmp.git",
+    "browserify": "git://github.com/justinTNT/browserify.git",
     "convoy": "0.4.1",
     "convoy-stylus": "0.1.4",
     "less": "1.4.0",
