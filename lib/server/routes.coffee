@@ -15,7 +15,9 @@ module.exports = (projectRoot, app) ->
 		fn session
 
 	route 'logout', (data, io, session, fn) ->
+		session.user = null
 		session.destroy()
+		session.save()
 		fn()
 
 
