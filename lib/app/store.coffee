@@ -29,7 +29,9 @@ module.exports = (Ember, DS, App, socket) ->
 				Ember.run this, ->
 					@didCreateRecord store, type, record, json
 		updateRecord: (store, type, record) ->
-			socket.emit 'db', op: 'save', type: util.typeName(type), record: record.serialize(includeId: true), (json) =>
+			rec = record.serialize(includeId:false)
+			rec.id = String(record.get 'id')
+			socket.emit 'db', op: 'save', type: util.typeName(type), record: rec, (json) =>
 				Ember.run this, ->
 					@didSaveRecord store, type, record, json
 		deleteRecord: (store, type, record) ->
